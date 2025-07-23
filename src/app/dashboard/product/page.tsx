@@ -54,29 +54,7 @@ interface ProductFormData extends Omit<Partial<Product>, "productCategory"> {
   productCategory: string[]; // array of string
 }
 
-export async function fetchProductsFromAppwrite() {
-  try {
-    const response = await databases.listDocuments(
-      DATABASE_ID,
-      COLLECTION_PRODUCT_ID,
-    );
-    return response.documents.map((doc: any) => ({
-      $id: doc.$id,
-      name: doc.name,
-      desc: doc.desc,
-      slug: doc.slug,
-      price: doc.price,
-      date: doc.date,
-      images: doc.images, // tetap string di Product
-      productCategory: doc.productCategory || [],
-    }));
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    return [];
-  }
-}
-
-export function getProductImageUrl(fileId: string) {
+function getProductImageUrl(fileId: string) {
   if (!fileId) return "";
   return `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${fileId}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}`;
 }
