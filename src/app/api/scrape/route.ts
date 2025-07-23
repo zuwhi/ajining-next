@@ -2,10 +2,13 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import * as cheerio from "cheerio";
 
+// Tambahkan slug ke tipe Product
 type Product = {
   name: string;
   price: number;
   category: string;
+  image: string;
+  slug: string;
 };
 
 export async function GET() {
@@ -35,11 +38,37 @@ export async function GET() {
         $(element).find(".ast-woo-product-category").first().text().trim() ||
         "Uncategorized";
 
+      // Ambil gambar produk: prioritaskan data-src, lalu src, jangan ambil data:image
+      const imgElem = $(element)
+        .find(
+          ".woocommerce-LoopProduct-link.woocommerce-loop-product__link img",
+        )
+        .first();
+      let image = imgElem.attr("data-src") || imgElem.attr("src") || "";
+      // Jika src/data-src mengandung 'data:image', kosongkan
+      if (image.startsWith("data:image")) {
+        image = "";
+      }
+
+      // Ambil slug dari href produk
+      const linkElem = $(element)
+        .find(".woocommerce-LoopProduct-link.woocommerce-loop-product__link")
+        .first();
+      let slug = "";
+      const href = linkElem.attr("href") || "";
+      // Ekstrak slug dari href, misal: /produk/SLUG/ atau .../produk/SLUG/
+      const match = href.match(/\/produk\/([^\/]+)\/?/);
+      if (match && match[1]) {
+        slug = match[1];
+      }
+
       if (name) {
         result.push({
           name,
           price,
           category,
+          image,
+          slug,
         });
       }
     });
