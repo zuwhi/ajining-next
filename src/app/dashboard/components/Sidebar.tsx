@@ -16,6 +16,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ShoppingCartIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import { logout } from "@/lib/auth";
 
@@ -39,6 +40,16 @@ const menuItems = [
     title: "Kategori Produk",
     href: "/dashboard/product-category",
     icon: TagIcon,
+  },
+  {
+    title: "Cart",
+    href: "/dashboard/cart",
+    icon: ShoppingCartIcon,
+  },
+  {
+    title: "Nota",
+    href: "/dashboard/nota",
+    icon: DocumentTextIcon,
   },
   {
     title: "Reports",
