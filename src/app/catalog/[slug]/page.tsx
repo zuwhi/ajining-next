@@ -33,6 +33,8 @@ interface ProductData {
   sourceUrl: string;
 }
 
+import { motion, AnimatePresence } from "framer-motion";
+
 const ProductDetailPage: React.FC = () => {
   const params = useParams();
   const slug = params?.slug as string;
@@ -96,263 +98,245 @@ const ProductDetailPage: React.FC = () => {
 
   const formatDescription = (text: string) => {
     return text.split("\n").map((paragraph, index) => (
-      <p key={index} className="mb-6 leading-relaxed">
+      <p key={index} className="mb-6">
         {paragraph}
       </p>
     ));
   };
 
-  if (loading) return <div className="p-12 text-center">Loading...</div>;
-  if (error)
-    return <div className="p-12 text-center text-red-600">Error: {error}</div>;
-  if (!productData)
-    return <div className="p-12 text-center">Produk tidak ditemukan</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-brand-offwhite flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-brand-gold border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="font-serif italic text-2xl text-brand-charcoal">Curating Details...</p>
+      </div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="min-h-screen bg-brand-offwhite flex items-center justify-center p-12">
+      <div className="text-center max-w-md">
+         <h2 className="text-3xl font-serif text-brand-charcoal mb-4">Something went wrong</h2>
+         <p className="text-red-600 mb-8">{error}</p>
+         <button onClick={() => window.location.reload()} className="px-8 py-3 bg-brand-charcoal text-white uppercase tracking-widest text-sm font-bold">Try Again</button>
+      </div>
+    </div>
+  );
+
+  if (!productData) return <div className="p-12 text-center font-serif italic text-2xl">Masterpiece not found.</div>;
 
   return (
-    <div className="min-h-screen bg-white text-black">
-      {/* Breadcrumb */}
-      {/* <nav className="border-b border-gray-100 px-6 py-4 text-sm text-gray-600">
-        <div className="mx-auto max-w-7xl">
-          <span>Beranda</span>
-          <span className="mx-2">/</span>
-          <span>Produk</span>
-          <span className="mx-2">/</span>
-          <span className="text-black">{productData.category}</span>
-        </div>
-      </nav> */}
-
-      <div className="mx-auto max-w-7xl px-6 py-12">
-        {/* Header */}
-        <header className="mb-12">
-          <div className="mb-4 inline-block rounded-md border border-gray-300 px-3 py-1 text-xs text-gray-700">
-            {productData.category}
-          </div>
-          <h1 className="mb-6 text-4xl leading-tight font-light md:text-5xl">
-            {productData.title}
-          </h1>
-        </header>
-
-        <div className="mb-16 grid grid-cols-1 gap-16 lg:grid-cols-2">
-          {/* Gallery */}
-          <div className="space-y-6">
-            <div className="relative aspect-square overflow-hidden rounded-md bg-gray-50">
-              <img
-                src={productData.images[selectedImageIndex]}
-                alt={`${productData.title} - Gambar ${selectedImageIndex + 1}`}
-                className="h-full w-full cursor-pointer object-cover transition-opacity hover:opacity-95"
+    <div className="min-h-screen bg-brand-offwhite text-brand-charcoal pb-24">
+      {/* Product Hero Section */}
+      <section className="bg-white border-b border-brand-stone py-12 lg:py-24">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+            {/* Gallery Column */}
+            <div className="space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative aspect-square overflow-hidden bg-brand-offwhite group cursor-zoom-in"
                 onClick={() => setIsLightboxOpen(true)}
-              />
+              >
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={selectedImageIndex}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    src={productData.images[selectedImageIndex]}
+                    alt={productData.title}
+                    className="w-full h-full object-cover"
+                  />
+                </AnimatePresence>
+                
+                {productData.images.length > 1 && (
+                  <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handlePrevImage(); }}
+                      className="w-12 h-12 rounded-full bg-white/80 shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
+                      className="w-12 h-12 rounded-full bg-white/80 shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+
               {productData.images.length > 1 && (
-                <>
-                  <button
-                    onClick={handlePrevImage}
-                    className="absolute top-1/2 left-4 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-lg transition-colors hover:bg-white"
-                    aria-label="Gambar sebelumnya"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={handleNextImage}
-                    className="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-lg transition-colors hover:bg-white"
-                    aria-label="Gambar selanjutnya"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                </>
+                <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                  {productData.images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`relative w-24 h-24 flex-shrink-0 overflow-hidden border-2 transition-all ${
+                        selectedImageIndex === index ? "border-brand-gold" : "border-transparent opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img src={image} className="w-full h-full object-cover" alt={`Gallery ${index}`} />
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
 
-            {productData.images.length > 1 && (
-              <div className="flex gap-4 overflow-x-auto">
-                {productData.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImageIndex(index)}
-                    className={`h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border-2 transition-colors ${
-                      selectedImageIndex === index
-                        ? "border-black"
-                        : "border-gray-200 hover:border-gray-400"
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`Thumbnail ${index + 1}`}
-                      className="h-full w-full object-cover"
-                    />
-                  </button>
-                ))}
+            {/* Info Column */}
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex flex-col h-full justify-between py-4"
+            >
+              <div>
+                <span className="text-brand-gold font-medium uppercase tracking-[0.3em] text-xs mb-4 block">
+                  {productData.category}
+                </span>
+                <h1 className="text-5xl lg:text-7xl font-serif leading-tight mb-8">
+                  {productData.title}
+                </h1>
+                <div className="text-3xl font-light text-brand-charcoal/80 mb-8 border-b border-brand-stone pb-8">
+                  {productData.price}
+                </div>
+                
+                <div className="text-gray-500 text-lg leading-relaxed space-y-4 mb-12 max-w-xl">
+                  {productData.shortDescription}
+                </div>
               </div>
-            )}
-          </div>
 
-          {/* Product Info */}
-          <div className="space-y-8">
-            <div className="text-3xl font-light">{productData.price}</div>
-
-            <p className="text-lg leading-relaxed text-gray-800">
-              {productData.shortDescription}
-            </p>
-
-            <div className="space-y-4">
-              <button className="w-full rounded-md bg-black px-6 py-4 text-lg font-medium text-white transition-colors hover:bg-gray-900">
-                Pesan Sekarang
-              </button>
-              <button className="flex w-full items-center justify-center gap-2 rounded-md border border-black px-6 py-4 text-lg font-medium text-black transition-colors hover:bg-gray-50">
-                <MessageCircle className="h-5 w-5" />
-                Konsultasi via WhatsApp
-              </button>
-            </div>
+              <div className="space-y-4 max-w-md">
+                <button className="w-full bg-brand-charcoal text-white py-5 px-8 text-sm uppercase tracking-[0.2em] font-bold hover:bg-black transition-all duration-300">
+                  Contact Specialist
+                </button>
+                <div className="flex gap-4">
+                  <button className="flex-1 flex items-center justify-center gap-2 border border-brand-stone py-5 px-8 text-sm uppercase tracking-[0.2em] font-bold hover:bg-brand-gold hover:text-white transition-all duration-300">
+                    <MessageCircle className="h-4 w-4" />
+                    WhatsApp
+                  </button>
+                  <a 
+                    href={productData.sourceUrl} 
+                    target="_blank" 
+                    className="w-16 flex items-center justify-center border border-brand-stone hover:bg-gray-50 transition-colors"
+                  >
+                    <ExternalLink className="h-5 w-5" />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
+      </section>
 
-        {/* Specifications */}
-        <section className="mb-16">
-          <h2 className="mb-8 text-2xl font-light">Spesifikasi Produk</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {Object.entries(productData.specs).map(([key, value]) => (
-              <div
-                key={key}
-                className="flex flex-col space-y-2 rounded-md border border-gray-200 p-6"
-              >
-                <dt className="font-mono text-sm tracking-wider text-gray-600 uppercase">
-                  {key}
-                </dt>
-                <dd className="font-mono text-lg">{value}</dd>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Long Description */}
-        <section className="mb-16">
-          <h2 className="mb-8 text-2xl font-light">Deskripsi Lengkap</h2>
-          <div className="prose max-w-none">
-            <div className="space-y-6 text-lg leading-relaxed">
-              {formatDescription(productData.longDescription)}
-            </div>
-          </div>
-        </section>
-
-        {/* Related Products */}
-        <section className="mb-16">
-          <h2 className="mb-8 text-2xl font-light">Produk Terkait</h2>
-          <div className="relative">
-            <div className="flex gap-6 overflow-hidden">
-              {productData.relatedProducts
-                .slice(relatedProductIndex, relatedProductIndex + 3)
-                .map((product, index) => (
-                  <div key={index} className="min-w-0 flex-1">
-                    <div className="group cursor-pointer">
-                      <div className="mb-4 aspect-[3/2] overflow-hidden rounded-md bg-gray-100">
-                        <img
-                          src={product.image}
-                          alt={product.title}
-                          className="h-full w-full object-cover transition-opacity group-hover:opacity-90"
-                        />
-                      </div>
-                      <h3 className="mb-2 text-lg font-light transition-colors group-hover:text-gray-700">
-                        {product.title}
-                      </h3>
-                      <p className="font-mono text-xl">{product.price}</p>
-                    </div>
+      {/* Specifications & Details Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-24">
+            {/* Left Col: Specs */}
+            <div className="lg:col-span-4">
+              <h2 className="text-2xl font-serif italic mb-12 border-l-4 border-brand-gold pl-6">Specifications</h2>
+              <dl className="space-y-1">
+                {Object.entries(productData.specs).map(([key, value]) => (
+                  <div key={key} className="flex justify-between py-6 border-b border-brand-stone group">
+                    <dt className="text-xs uppercase tracking-[0.2em] text-gray-400 group-hover:text-brand-gold transition-colors">{key}</dt>
+                    <dd className="text-sm font-medium">{value}</dd>
                   </div>
                 ))}
+              </dl>
             </div>
 
-            {productData.relatedProducts.length > 3 && (
-              <div className="mt-8 flex justify-center gap-4">
-                <button
-                  onClick={handlePrevRelated}
-                  className="rounded-full border border-gray-300 p-2 transition-colors hover:border-black"
-                  aria-label="Produk terkait sebelumnya"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={handleNextRelated}
-                  className="rounded-full border border-gray-300 p-2 transition-colors hover:border-black"
-                  aria-label="Produk terkait selanjutnya"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
+            {/* Right Col: Long Description */}
+            <div className="lg:col-span-8">
+              <h2 className="text-2xl font-serif italic mb-12 border-l-4 border-brand-gold pl-6">Deep Narrative</h2>
+              <div className="prose prose-brand text-gray-600 max-w-none text-xl leading-relaxed">
+                {formatDescription(productData.longDescription)}
               </div>
-            )}
-          </div>
-        </section>
-
-        {/* Bottom CTA */}
-        <section className="border-t border-gray-200 py-16 text-center">
-          <h2 className="mb-6 text-3xl font-light">
-            Tertarik dengan Produk Ini?
-          </h2>
-          <p className="mx-auto mb-8 max-w-2xl text-lg text-gray-700">
-            Konsultasikan kebutuhan furniture ukiran Anda dengan tim ahli kami.
-            Kami siap membantu mewujudkan desain impian Anda.
-          </p>
-          <div className="mx-auto flex max-w-md flex-col justify-center gap-4 sm:flex-row">
-            <button className="rounded-md bg-black px-8 py-3 text-white transition-colors hover:bg-gray-900">
-              Hubungi Kami
-            </button>
-            <a
-              href={productData.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-md border border-black px-8 py-3 text-black transition-colors hover:bg-gray-50"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Lihat Asli
-            </a>
-          </div>
-        </section>
-      </div>
-
-      {/* Lightbox Modal */}
-      {isLightboxOpen && productData && (
-        <div
-          className="bg-opacity-90 fixed inset-0 z-50 flex items-center justify-center bg-black p-6"
-          onClick={() => setIsLightboxOpen(false)}
-        >
-          <div className="relative max-h-full max-w-4xl">
-            <button
-              onClick={() => setIsLightboxOpen(false)}
-              className="absolute -top-12 right-0 text-white transition-colors hover:text-gray-300"
-              aria-label="Tutup lightbox"
-            >
-              <X className="h-8 w-8" />
-            </button>
-            <img
-              src={productData.images[selectedImageIndex]}
-              alt={`${productData.title} - Gambar ${selectedImageIndex + 1}`}
-              className="max-h-full max-w-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-            {productData.images.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlePrevImage();
-                  }}
-                  className="absolute top-1/2 left-4 -translate-y-1/2 rounded-full bg-white/20 p-3 text-white transition-colors hover:bg-white/30"
-                  aria-label="Gambar sebelumnya"
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleNextImage();
-                  }}
-                  className="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-white/20 p-3 text-white transition-colors hover:bg-white/30"
-                  aria-label="Gambar selanjutnya"
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-              </>
-            )}
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* Related Products */}
+      {productData.relatedProducts.length > 0 && (
+        <section className="py-24 border-t border-brand-stone bg-white">
+          <div className="container mx-auto px-6">
+            <div className="flex justify-between items-end mb-16">
+              <div>
+                <span className="text-brand-gold font-medium uppercase tracking-[0.3em] text-xs mb-4 block">Recommended</span>
+                <h2 className="text-4xl lg:text-5xl font-serif">Related <span className="italic">Treasures</span></h2>
+              </div>
+              {productData.relatedProducts.length > 3 && (
+                <div className="flex gap-4">
+                  <button onClick={handlePrevRelated} className="w-12 h-12 border border-brand-stone flex items-center justify-center hover:border-brand-gold hover:text-brand-gold transition-colors rounded-full">
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button onClick={handleNextRelated} className="w-12 h-12 border border-brand-stone flex items-center justify-center hover:border-brand-gold hover:text-brand-gold transition-colors rounded-full">
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <AnimatePresence mode="popLayout text-center">
+                {productData.relatedProducts
+                  .slice(relatedProductIndex, relatedProductIndex + 3)
+                  .map((product, index) => (
+                    <motion.div
+                      key={product.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className="group cursor-pointer"
+                    >
+                      <div className="aspect-[3/2] overflow-hidden bg-brand-offwhite mb-6">
+                        <img src={product.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" alt={product.title} />
+                      </div>
+                      <h4 className="font-serif text-xl mb-2 group-hover:text-brand-gold transition-colors">{product.title}</h4>
+                      <p className="text-brand-gold font-medium text-lg">{product.price}</p>
+                    </motion.div>
+                  ))
+                }
+              </AnimatePresence>
+            </div>
+          </div>
+        </section>
       )}
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {isLightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-brand-charcoal/95 p-6 md:p-12"
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            <button className="absolute top-8 right-8 text-white hover:text-brand-gold">
+              <X className="h-10 w-10" />
+            </button>
+            <motion.div 
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="relative max-w-6xl max-h-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={productData.images[selectedImageIndex]}
+                className="w-full h-full object-contain shadow-2xl"
+                alt="Product High Res"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -40,14 +40,14 @@ export default function RootLayout({
               : "bg-transparent"
           }`}
         >
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
               <div className="flex-shrink-0">
                 <h1
-                  className="cursor-pointer text-2xl font-bold text-gray-900"
+                  className="cursor-pointer text-2xl font-serif font-bold text-brand-charcoal tracking-tight"
                   onClick={() => router.push("/")}
                 >
-                  Ajining Furniture
+                  Ajining<span className="text-brand-gold italic font-normal ml-1">Furniture</span>
                 </h1>
               </div>
 
@@ -56,19 +56,19 @@ export default function RootLayout({
                 <div className="ml-10 flex items-baseline space-x-8">
                   <button
                     onClick={() => router.push("/")}
-                    className="px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:text-amber-600"
+                    className="px-3 py-2 text-xs font-medium uppercase tracking-[0.2em] text-brand-charcoal transition-all hover:text-brand-gold"
                   >
                     Home
                   </button>
                   <button
                     onClick={() => router.push("/catalog")}
-                    className="px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:text-amber-600"
+                    className="px-3 py-2 text-xs font-medium uppercase tracking-[0.2em] text-brand-charcoal transition-all hover:text-brand-gold"
                   >
                     Catalog
                   </button>
                   <button
                     onClick={() => router.push("/contact")}
-                    className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+                    className="ml-4 rounded-none bg-brand-charcoal px-6 py-2 text-xs font-medium uppercase tracking-[0.2em] text-white transition-all hover:bg-black"
                   >
                     Contact
                   </button>
@@ -135,12 +135,11 @@ export default function RootLayout({
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-8 md:grid-cols-4">
               <div className="col-span-2">
-                <h3 className="mb-4 text-2xl font-bold text-gray-900">
-                  Ajining
+                <h3 className="mb-6 text-3xl font-serif font-bold text-brand-charcoal">
+                  Ajining<span className="text-brand-gold italic font-normal ml-1">Furniture</span>
                 </h3>
-                <p className="mb-6 leading-relaxed text-gray-600">
-                  Premium furniture untuk rumah modern Anda. Kualitas terjamin,
-                  desain eksklusif, dan layanan terbaik.
+                <p className="mb-8 leading-relaxed text-gray-500 max-w-sm">
+                  Elevating your living experience with curated artisanal furniture. Since 2015, we've been the standard for modern Indonesian craftsmanship.
                 </p>
                 <div className="flex space-x-4">
                   <div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-900 hover:text-white">
