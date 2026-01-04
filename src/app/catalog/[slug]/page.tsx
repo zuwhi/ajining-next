@@ -282,7 +282,7 @@ const ProductDetailPage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <AnimatePresence mode="popLayout text-center">
+              <AnimatePresence mode="popLayout">
                 {productData.relatedProducts
                   .slice(relatedProductIndex, relatedProductIndex + 3)
                   .map((product, index) => (
